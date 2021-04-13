@@ -1,0 +1,2 @@
+# graphQLPractice
+Practicing Graph QL 
