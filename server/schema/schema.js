@@ -1,17 +1,23 @@
 const graphql = require('graphql');
 const _ = require('lodash');
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLID } = graphql;
+const { GraphQLObjectType, GraphQLInt, GraphQLID } = graphql;
 const { EmployeeType, employees } = require('./employee-schema');
 const { DepartmentType, departments } = require('./department-schema');
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
-    fields: {
+    fields: () => ({
         employee: {
             type: EmployeeType,
             args: { id: { type: GraphQLInt } },
             resolve(parent, args) {
                 // code to get data from DB
                 return _.find(employees, { id: args.id })
+            }
+        },
+        employees: {
+            type: new graphql.GraphQLList(EmployeeType),
+            resolve(parent, args) {
+                return employees;
             }
         },
         department: {
@@ -22,7 +28,7 @@ const RootQuery = new GraphQLObjectType({
                 return _.find(departments, {id: parseInt(args.id)})
             }
         }
-    }
+    })
 });
 
 module.exports = new graphql.GraphQLSchema({
