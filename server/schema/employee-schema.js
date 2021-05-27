@@ -1,7 +1,7 @@
 const graphql = require('graphql');
-const { DepartmentType, departments } = require('./department-schema');
 const _ = require('lodash');
 const { GraphQLObjectType, GraphQLString, GraphQLInt } = graphql;
+const departments = [{ id: 1, name: 'IT Support' }, { id: 2, name: 'Finance' }];
 const employees = [{
     id: 1,
     firstname: 'firstEmp',
@@ -35,10 +35,23 @@ const EmployeeType = new GraphQLObjectType({
             type: DepartmentType,
             resolve(parent, args) {
                 console.log(parent);
-                return _.find(departments, {id: parent.departmentId})
+                return _.find(departments, { id: parent.departmentId })
             }
         }
     })
 });
 
-module.exports = { EmployeeType, employees };
+const DepartmentType = new graphql.GraphQLObjectType({
+    name: 'Department',
+    fields: () => ({
+        id: { type: graphql.GraphQLInt },
+        name: { type: graphql.GraphQLString },
+        employees: {
+            type: new graphql.GraphQLList(EmployeeType),
+            resolve(parent, args) {
+                return _.filter(employees, { departmentId: parent.id });
+            }
+        }
+    })
+});
+module.exports = { EmployeeType, employees, DepartmentType, departments };
